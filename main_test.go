@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/taadis/zhichi/auth"
+	"github.com/taadis/zhichi/core"
 	"github.com/taadis/zhichi/env"
 	"github.com/taadis/zhichi/ticket"
 )
@@ -17,7 +18,7 @@ var (
 
 func TestMain(m *testing.M) {
 	testBaseUrl = env.GetHost()
-	testBaseUrl = SOBOT_ALIYUN
+	testBaseUrl = core.SOBOT_ALIYUN
 	testAppid = env.GetAppid()
 	os.Exit(m.Run())
 }
@@ -49,6 +50,7 @@ func TestTicket(t *testing.T) {
 		// Add tests for get_token here
 		req := &ticket.GetTimezoneRequest{}
 		rsp, err := client.Ticket.GetTimezone(ctx, req)
+
 		if err != nil {
 			t.Fatal(err)
 		}
