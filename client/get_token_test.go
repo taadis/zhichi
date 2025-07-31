@@ -11,8 +11,9 @@ import (
 
 func TestGetToken(t *testing.T) {
 	appid := "123"
+	app_key := "your_app_key"
 	ctx := context.Background()
-	at := NewDefaultAccessToken(core.SOBOT_ALIYUN, appid, http.DefaultClient, cache.NewMemoryCache())
+	at := NewDefaultAccessToken(core.SOBOT_ALIYUN, appid, app_key, http.DefaultClient, cache.NewMemoryCache())
 	token, err := at.GetTokenFromServer(ctx)
 	if err != nil {
 		t.Fatal(err)

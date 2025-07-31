@@ -9,8 +9,10 @@ import (
 	"sync"
 	"time"
 
+	"github.com/taadis/http2curl"
 	"github.com/taadis/zhichi/cache"
 	"github.com/taadis/zhichi/core"
+	"github.com/taadis/zhichi/sign"
 )
 
 // AccessTokenHandler AccessToken 接口
@@ -25,6 +27,8 @@ type DefaultAccessToken struct {
 	//
 	appid string
 	//
+	app_key string
+	//
 	cache cache.Cache
 	//
 	sync.Mutex
@@ -32,10 +36,11 @@ type DefaultAccessToken struct {
 	httpClient *http.Client
 }
 
-func NewDefaultAccessToken(host string, appid string, httpClient *http.Client, cache cache.Cache) *DefaultAccessToken {
+func NewDefaultAccessToken(host string, appid string, app_key string, httpClient *http.Client, cache cache.Cache) *DefaultAccessToken {
 	t := new(DefaultAccessToken)
 	t.host = host
 	t.appid = appid
+	t.app_key = app_key
 	t.httpClient = httpClient
 	t.cache = cache
 	return t
@@ -134,6 +139,27 @@ func (t *DefaultAccessToken) GetTokenFromServer(ctx context.Context) (string, er
 	if err != nil {
 		return "", fmt.Errorf("failed to create base request: %w", err)
 	}
+	create_time := fmt.Sprintf("%d", time.Now().Unix())
+	sign := sign.GenSign(t.appid, create_time, t.app_key)
+
+	query := req.URL.Query()
+	if t.appid != "" {
+		query.Set("appid", t.appid)
+	}
+	if create_time != "" {
+		query.Set("create_time", create_time)
+	}
+	if sign != "" {
+		query.Set("sign", sign)
+	}
+	req.URL.RawQuery = query.Encode()
+
+	// todo:这里的http请求应该和其他接口的复用,http应该共享一个client
+	curlcmd, err := http2curl.GetCurlCommand(req)
+	if err != nil {
+		return "", err
+	}
+	fmt.Println(curlcmd.String())
 
 	rsp, err := t.httpClient.Do(req)
 	if err != nil {

@@ -30,7 +30,7 @@ func NewHttpClient(server string, appid string, opts ...Option) *HttpClient {
 		opt(options)
 	}
 
-	tokenHandler := NewDefaultAccessToken(options.server, appid, http.DefaultClient, options.cache)
+	tokenHandler := NewDefaultAccessToken(options.server, appid, options.app_key, http.DefaultClient, options.cache)
 	c := &HttpClient{
 		options:      options,
 		Client:       http.DefaultClient,
