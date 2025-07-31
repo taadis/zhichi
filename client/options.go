@@ -11,6 +11,8 @@ type Options struct {
 	server string
 	// 第三方用户接口调用唯一凭证id
 	appid string
+	//
+	app_key string
 	// 时间戳（秒）
 	createTime int64
 	// 签名
@@ -31,6 +33,12 @@ type Option func(*Options)
 func WithAppid(appid string) Option {
 	return func(o *Options) {
 		o.appid = appid
+	}
+}
+
+func WithAppKey(app_key string) Option {
+	return func(o *Options) {
+		o.app_key = app_key
 	}
 }
 
