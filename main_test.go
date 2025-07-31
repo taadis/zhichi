@@ -6,6 +6,8 @@ import (
 	"testing"
 
 	"github.com/taadis/zhichi/auth"
+	"github.com/taadis/zhichi/cache"
+	"github.com/taadis/zhichi/client"
 	"github.com/taadis/zhichi/core"
 	"github.com/taadis/zhichi/env"
 	"github.com/taadis/zhichi/ticket"
@@ -42,7 +44,7 @@ func TestAuth(t *testing.T) {
 
 func TestTicket(t *testing.T) {
 	appid := testAppid
-	client := NewClient(testBaseUrl, appid)
+	client := NewClient(testBaseUrl, appid, client.WithCache(cache.NewMemoryCache()))
 	ctx := context.Background()
 
 	t.Run("ticket:get_timezone", func(t *testing.T) {
