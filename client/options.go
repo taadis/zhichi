@@ -3,6 +3,8 @@ package client
 import (
 	"net/http"
 	"time"
+
+	"github.com/taadis/zhichi/cache"
 )
 
 type Options struct {
@@ -15,6 +17,8 @@ type Options struct {
 	sign string
 	// token
 	token string
+	// cache
+	cache cache.Cache
 
 	// transport
 	transport *http.Transport
@@ -53,5 +57,11 @@ func WithTransport(tr *http.Transport) Option {
 func WithTimeout(t *time.Duration) Option {
 	return func(o *Options) {
 		o.timeout = t
+	}
+}
+
+func WithCache(cache cache.Cache) Option {
+	return func(o *Options) {
+		o.cache = cache
 	}
 }
