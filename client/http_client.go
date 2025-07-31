@@ -18,6 +18,8 @@ type HttpClient struct {
 	options *Options
 	//
 	*http.Client
+	//
+	tokenHandler AccessTokenHandler
 }
 
 func NewHttpClient(server string, appid string, opts ...Option) *HttpClient {
@@ -27,10 +29,14 @@ func NewHttpClient(server string, appid string, opts ...Option) *HttpClient {
 	for _, opt := range opts {
 		opt(options)
 	}
-	return &HttpClient{
-		options: options,
-		Client:  http.DefaultClient,
+
+	tokenHandler := NewDefaultAccessToken(options.server, appid, http.DefaultClient, options.cache)
+	c := &HttpClient{
+		options:      options,
+		Client:       http.DefaultClient,
+		tokenHandler: tokenHandler,
 	}
+	return c
 }
 
 func (c *HttpClient) SendRequest(req *http.Request) (*http.Response, error) {
@@ -114,8 +120,16 @@ func (c *HttpClient) NewRawRequest(ctx context.Context, method string, endpoint 
 		return nil, err
 	}
 	fmt.Println("[debug] got appid=", c.GetAppid())
-	if c.options.token != "" {
-		fmt.Println("[debug] got token=", c.options.token)
+
+	if c.options.token == "" {
+		// 无token选项参数时, 从内置逻辑中自动获取token
+		token, err := c.tokenHandler.GetAccessToken(ctx)
+		if err != nil {
+			return nil, fmt.Errorf("failed to get access token: %w", err)
+		}
+		req.Header.Set("token", token)
+	} else {
+		// 有token选项参数时,使用用户提供的token选项参数(需要用户自己处理token存储和刷新逻辑)
 		req.Header.Set("token", c.options.token)
 	}
 	req.Header.Set("Cache-Control", "no-cache")
@@ -129,17 +143,4 @@ func (c *HttpClient) ReadResponseBody(body io.Reader) string {
 		return fmt.Sprintf("failed to read response body: %v", err)
 	}
 	return string(bodyBytes)
-}
-
-type BaseResponse struct {
-	//
-	Errcode string `json:"errcode,omitempty"`
-	//
-	ErrorDesc string `json:"error_desc,omitempty"`
-	// 返回编码
-	RetCode string `json:"ret_code,omitempty"`
-	// 返回信息
-	RetMsg string `json:"ret_msg,omitempty"`
-	// 返回数据
-	Item interface{} `json:"item,omitempty"`
 }
