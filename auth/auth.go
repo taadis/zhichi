@@ -1,6 +1,8 @@
 package auth
 
-import "github.com/taadis/zhichi/client"
+import (
+	"github.com/taadis/zhichi/client"
+)
 
 type Auth struct {
 	httpClient *client.HttpClient

@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/taadis/zhichi/client"
+	"github.com/taadis/zhichi/core"
 )
 
 // see more: https://developer.zhichi.com/pages/950d89/
@@ -20,7 +20,7 @@ type GetTokenRequest struct {
 }
 
 type GetTokenResponse struct {
-	*client.BaseResponse
+	*core.BaseResponse
 	// 返回数据
 	Item *TokenItem `json:"item,omitempty"`
 }
@@ -55,6 +55,10 @@ func (r *GetTokenResponse) MarshalIndent() string {
 }
 
 func (c *Auth) GetToken(ctx context.Context, req *GetTokenRequest) (*GetTokenResponse, error) {
+	return c.getToken(ctx, req)
+}
+
+func (c *Auth) getToken(ctx context.Context, req *GetTokenRequest) (*GetTokenResponse, error) {
 	// if req.AppId == "" {
 	// 	return nil, fmt.Errorf("missing required app_id")
 	// }
@@ -86,5 +90,6 @@ func (c *Auth) GetToken(ctx context.Context, req *GetTokenRequest) (*GetTokenRes
 	if err := json.NewDecoder(rsp.Body).Decode(&ret); err != nil {
 		return nil, fmt.Errorf("failed to decode response: %w", err)
 	}
+
 	return &ret, nil
 }
