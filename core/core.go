@@ -61,6 +61,18 @@ func (r *BaseResponse) String() string {
 	return string(bs)
 }
 
+type BasePageResponse struct {
+	BaseResponse
+	// 当前页数
+	PageNo int `json:"page_no"`
+	// 当前页显示条数
+	PageSize int `json:"page_size"`
+	// 总页数
+	PageCount int `json:"page_count"`
+	// 总条数
+	TotalCount int `json:"total_count"`
+}
+
 func GetUri(host string, path string) *url.URL {
 	uri := &url.URL{
 		Scheme: "https",
