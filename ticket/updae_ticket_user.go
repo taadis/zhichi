@@ -21,6 +21,8 @@ type UpdateTicketUserResponse struct {
 	core.BaseResponse
 }
 
+// 工单更换客户信息
+// 更换工单绑定的客户信息
 func (t *Ticket) UpdateTicketUser(ctx context.Context, req *UpdateTicketUserRequest) (*UpdateTicketUserResponse, error) {
 	httpReq, err := t.httpClient.NewRawRequest(ctx, http.MethodPost, "/api/ws/5/ticket/update_ticket_user", req)
 	if err != nil {
